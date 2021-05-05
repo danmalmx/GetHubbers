@@ -13,28 +13,20 @@ function Search(props) {
     let [frameList, setframeList] = useState([]);
 
     let history = useHistory();
+
     
     const onChangeLang = (e) => {
         langCheck = e.target;
-        console.log(langCheck.checked)
-        if(langCheck.checked) {
+        if(langCheck.checked && !langList.includes(e.target.name)) {
             setLangCheck(langList.push(e.target.name));
-        } else if(langCheck.checked === false) {
+            console.log(langList);
+        } else if(!langCheck.checked) {
+            console.log(langList);
             switch (e.target.name) {
-                case "javascript": 
-                    langList.splice("javascript", 1)
-                    break;
-                case "csharp": 
-                    langList.splice("csharp", 1)
-                    break;
-                case "java": 
-                    langList.splice("java", 1)
-                    break;
-                case "python": 
-                    langList.splice("python", 1)
-                    break;
-                case "php": 
-                    langList.splice("php", 1)
+                case e.target.name: 
+                    const removeLang = langList.indexOf(e.target.name)
+                    langList.splice(removeLang, 1)
+                    console.log(langList);
                     break;
             
                 default:
@@ -45,25 +37,15 @@ function Search(props) {
 
     const onChangeFrame = (e) => {
         frameCheck = e.target;
-        console.log(frameCheck.checked)
-        if(frameCheck.checked) {
+        if(frameCheck.checked && !frameList.includes(e.target.name)) {
             setFrameCheck(frameList.push(e.target.name));
-        }  else if(frameCheck.checked === false) {
+            console.log(frameList);
+        }  else if(!frameCheck.checked) {
             switch (e.target.name) {
-                case "angular": 
-                    langList.splice("angular", 1)
-                    break;
-                case "react": 
-                    langList.splice("react", 1)
-                    break;
-                case "dotnet": 
-                    langList.splice("dotnet", 1)
-                    break;
-                case "laravel": 
-                    langList.splice("laravel", 1)
-                    break;
-                case "django": 
-                    langList.splice("django", 1)
+                case e.target.name: 
+                    const removeFrame = frameList.indexOf(e.target.name)
+                    frameList.splice(removeFrame, 1)
+                    console.log(frameList);
                     break;
             
                 default:
@@ -78,11 +60,15 @@ function Search(props) {
 
     const onSubmit = (e) => {
         e.preventDefault();
-        if (!langCheck) { 
-            props.showAlert('Välj minst ett programmeringspråk');
+        if (!langCheck && !frameCheck || langList === undefined && frameList === undefined || langList.length === 0 && frameList.length === 0 ) { 
+            props.showAlert('Välj minst ett programmeringspråk och / eller ramverk');
         } else if (region && !tatOrter.includes(region)) {
             props.showAlert(`${region} är inte en av Sveriges 20 största städer. Eller så är det misstavat.`);
-        } else {
+        } 
+        // else if(!res) {
+        //     props.showAlert('Hittade inga profiler, Gör ett nytt val');
+        // }
+        else {
             props.searchRegion(langList.join('+'), frameList.join('+'), region);
             history.push('/profiles')
         }
@@ -91,7 +77,7 @@ function Search(props) {
     return (
         <div>
             <form onSubmit={onSubmit}>
-                <div className="choiceChange">
+                <div className="searchBar">
                 <LangSearch onChangeLang={onChangeLang} />
                 <FrameSearch onChangeFrame={onChangeFrame} />
                 </div>

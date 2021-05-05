@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Fragment } from 'react';
-import './App.css';
+import './App.scss';
 import axios from 'axios';
 import {BrowserRouter as Router, Switch, Route} from "react-router-dom";
 
@@ -15,12 +15,19 @@ function App(props) {
     const [profiles, setProfiles] = useState([]);
     const [profiler, setProfiler] = useState({});    
 
-const searchRegion = async (langList, frameList, region) => {
+const searchRegion = async (langList, frameList, region, setAlert) => {
 
     if(tatOrter.includes(region) || region === '') {
-            const res = await axios.get(`https://api.github.com/search/users?q=language:${langList && frameList ? `${langList}+${frameList}` : langList}+location:${region ? region : 'sweden'}&client_id=${process.env.REACT_APP_GH_CID}&client_secret=${process.env.REACT_APP_GH_CSC}`)
-            setProfiles(res.data.items);
-            console.log(res.data.items)
+        // const res = await axios.get(`https://api.github.com/search/users?q=language:${langList && frameList ? `${langList}+${frameList}` : langList ? `${langList}` : frameList ? `${frameList}` : `${langList}+${frameList}`}+location:${region ? region : 'sweden'}&client_id=${process.env.REACT_APP_GH_CID}&client_secret=${process.env.REACT_APP_GH_CSC}`)
+        const res = await axios.get(`https://api.github.com/search/users?q=language:${langList ? langList : frameList ? frameList : {langList, frameList}}+location:${region ? region : 'sweden'}&client_id=${process.env.REACT_APP_GH_CID}&client_secret=${process.env.REACT_APP_GH_CSC}`)
+            if(!res) {
+                let msg = 'Inga profiler hittade baserat på dina val'
+                console.log('No profiles')
+                setAlert(msg);
+
+            } else {
+                setProfiles(res.data.items);
+            }
         } 
 }
 
@@ -31,14 +38,14 @@ const getProfile = async (login) => {
 
 const showAlert = (msg) => {
     setAlert({msg});
-    setTimeout(() => [setAlert(null), window.location.reload()], 10000);
+    setTimeout(() => [setAlert(null)], 5000);
     
 }
 
 const closeAlert = () => {
     setAlert(null);
-    window.location.reload();
 }
+
 
     return ( 
         <Router>
