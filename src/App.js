@@ -1,26 +1,36 @@
-import React, { useState, Fragment } from 'react';
+import React, { useEffect, useState, Fragment } from 'react';
 import './App.scss';
 import axios from 'axios';
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 
-import Navbar from "./components/layout/Navbar";
-import Search from "./components/search/Search";
 import Alert from "./components/layout/Alert";
-import Profiles from "./components/profiles/Profiles";
+import Footer from './components/layout/Footer';
+import getCountry from './components/utilities/getCountry';
+import Navbar from "./components/layout/Navbar";
 import Profile from "./components/profiles/Profile";
-import tatOrter from '../src/tatOrter'
+import Profiles from "./components/profiles/Profiles";
+import Search from "./components/search/Search";
 
-
+// import citiesSweden from '../src/citiesSweden'
+import './i18n'
 
 function App() {
     const [alert, setAlert] = useState(null);
     const [profiles, setProfiles] = useState([]);
     const [profiler, setProfiler] = useState({});
+    const [countryName, setCountryName] = useState('');  
+    
+    useEffect(() => {
+        getCountry();
 
+        setCountryName(localStorage.getItem('countryName'));
+    }, [countryName]);
+
+    
     const searchRegion = async (codeList, region, setAlert) => {
-        if (tatOrter.includes(region) || region === '') {
+        if (region || region === '') {
             // const res = await axios.get(`https://api.github.com/search/users?q=language:${langList && frameList ? `${langList}+${frameList}` : langList ? `${langList}` : frameList ? `${frameList}` : `${langList}+${frameList}`}+location:${region ? region : 'sweden'}&client_id=${process.env.REACT_APP_GH_CID}&client_secret=${process.env.REACT_APP_GH_CSC}`)
-            const res = await axios.get(`https://api.github.com/search/users?q=language:${codeList ? codeList : ''}+location:${region ? region : 'sweden'}&client_id=${process.env.REACT_APP_GH_CID}&client_secret=${process.env.REACT_APP_GH_CSC}`)
+            const res = await axios.get(`https://api.github.com/search/users?q=language:${codeList ?? codeList}+location:${region ? region : countryName}&client_id=${process.env.REACT_APP_GH_CID}&client_secret=${process.env.REACT_APP_GH_CSC}`)
             if (res.data.items < 1) {
                 showAlert('Inga profiler hittades baserat på dina val');
             } else {
@@ -62,6 +72,7 @@ function App() {
                         <Profile {...props} getProfile={getProfile} profiler={profiler} />
                     )} />
                 </Switch>
+                <Footer />
             </div >
         </Router>
     );

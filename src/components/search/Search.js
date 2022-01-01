@@ -1,21 +1,22 @@
 import React, { useState } from 'react'
-import tatOrter from '../../tatOrter'
-import LangSearch from '../search/LanguageSearch'
-import FrameSearch from '../search/FrameworkSearch'
+import citiesSweden from '../../citiesSweden'
 import CodeSearch from '../search/CodeSearch'
 import TextSearch from '../search/TextSearch'
 import { useHistory } from 'react-router-dom'
+import { useTranslation} from 'react-i18next'
+
 
 function Search(props) {
+
+    const { t } = useTranslation();
+
     let [region, setRegion] = useState('');
     let [codeCheck, setCodeCheck] = useState('');
-    let [codeList, setCodeList] = useState([]);
-    let [langCheck, setLangCheck] = useState('');
-    let [frameCheck, setFrameCheck] = useState('');
-    let [langList, setLangList] = useState([]);
-    let [frameList, setframeList] = useState([]);
+    let [codeList] = useState([]);
 
     let history = useHistory();
+
+    let countryName = localStorage.getItem("countryName");
 
     const onChangeCode = (e) => {
         codeCheck = e.target;
@@ -36,56 +37,19 @@ function Search(props) {
             }
         }
     }
-    // const onChangeLang = (e) => {
-    //     langCheck = e.target;
-    //     if (langCheck.checked && !langList.includes(e.target.name)) {
-    //         setLangCheck(langList.push(e.target.name));
-    //         console.log(langList);
-    //     } else if (!langCheck.checked) {
-    //         console.log(langList);
-    //         switch (e.target.name) {
-    //             case e.target.name:
-    //                 const removeLang = langList.indexOf(e.target.name)
-    //                 langList.splice(removeLang, 1)
-    //                 console.log(langList);
-    //                 break;
-
-    //             default:
-    //                 break;
-    //         }
-    //     }
-    // }
-
-    // const onChangeFrame = (e) => {
-    //     frameCheck = e.target;
-    //     if (frameCheck.checked && !frameList.includes(e.target.name)) {
-    //         setFrameCheck(frameList.push(e.target.name));
-    //         console.log(frameList);
-    //     } else if (!frameCheck.checked) {
-    //         switch (e.target.name) {
-    //             case e.target.name:
-    //                 const removeFrame = frameList.indexOf(e.target.name)
-    //                 frameList.splice(removeFrame, 1)
-    //                 console.log(frameList);
-    //                 break;
-
-    //             default:
-    //                 break;
-    //         }
-    //     }
-    // }
 
     const onType = (e) => {
         setRegion(e.target.value)
     }
 
     const onSubmit = async (e) => {
+
         console.log(e.target.value)
         e.preventDefault();
         if (!codeCheck || codeList === undefined || codeList.length === 0) {
-            props.showAlert('Välj minst ett språk / ramverk');
-        } else if (region && !tatOrter.includes(region)) {
-            props.showAlert(`${region} är inte en av Sveriges 20 största städer. Eller så är det felstavat.`);
+            props.showAlert(t('showAlertCode'));
+        } else if (region && !citiesSweden.includes(region)) {
+            props.showAlert(`${region} ${t('showAlertRegion_1')} ${countryName === "United Kingdom" ? `the ${countryName}` : countryName}. ${t('showAlertRegion_2')}`);
         } else {
             console.log('props.searchRegion', await props.searchRegion());
             props.searchRegion(codeList.join('+'), region);
@@ -93,27 +57,13 @@ function Search(props) {
         }
 
     }
-    // const onSubmit = (e) => {
-    //     console.log(e.target.value)
-    //     e.preventDefault();
-    //     if (!langCheck && !frameCheck || langList === undefined && frameList === undefined || langList.length === 0 && frameList.length === 0) {
-    //         props.showAlert('Välj minst ett språk / ramverk');
-    //     } else if (region && !tatOrter.includes(region)) {
-    //         props.showAlert(`${region} är inte en av Sveriges 20 största städer. Eller så är det felstavat.`);
-    //     } else {
-    //         props.searchRegion(langList.join('+'), frameList.join('+'), region);
-    //         history.push('/profiles')
-    //     }
-
-    // }
 
     return (
+
         <div>
             <form onSubmit={onSubmit}>
                 <div className="searchBar">
                     <CodeSearch onChangeCode={onChangeCode} />
-                    {/* <LangSearch onChangeLang={onChangeLang} />
-                    <FrameSearch onChangeFrame={onChangeFrame} /> */}
                 </div>
                 <div>
                     <TextSearch onType={onType} />
